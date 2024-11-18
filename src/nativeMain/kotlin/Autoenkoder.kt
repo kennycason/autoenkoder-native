@@ -1,5 +1,14 @@
+import Matrix.add
+import Matrix.applyActivation
+import Matrix.dotProduct
+import Matrix.hadamardProduct
+import Matrix.randomMatrix
+import Matrix.scalarMultiply
+import Matrix.subtract
+import Matrix.transpose
 import kotlin.math.exp
 import kotlin.random.Random
+import kotlin.system.getTimeMillis
 
 
 /*
@@ -13,6 +22,10 @@ class Autoenkoder(
     private var decodeWeights = randomMatrix(hiddenSize, inputSize)
     private var biasHidden = DoubleArray(hiddenSize) { Random.nextDouble(-1.0, 1.0) }
     private var biasOutput = DoubleArray(inputSize) { Random.nextDouble(-1.0, 1.0) }
+
+    // activation functions
+    private fun sigmoid(x: Double): Double = 1.0 / (1.0 + exp(-x))
+    private fun sigmoidDerivative(x: Double): Double = x * (1.0 - x)
 
     fun train(inputs: Array<DoubleArray>, learningRate: Double = 0.1, epochs: Int = 1000) {
         repeat(epochs) { epoch ->
@@ -33,14 +46,14 @@ class Autoenkoder(
                 totalError += errors.flatMap { it.asIterable() }.sumOf { it * it }
 
                 // back propagation (output layer)
-                val outputGradient = hadamard(errors, applyActivation(output, ::sigmoidDerivative))
+                val outputGradient = hadamardProduct(errors, applyActivation(output, ::sigmoidDerivative))
                 val hiddenOutputTransposed = transpose(hiddenOutput)
                 val deltaWeightsHiddenOutput = dotProduct(hiddenOutputTransposed, outputGradient)
 
                 // back propagation (hidden layer)
                 val weightsHiddenOutputTransposed = transpose(decodeWeights)
                 val hiddenError = dotProduct(outputGradient, weightsHiddenOutputTransposed)
-                val hiddenGradient = hadamard(hiddenError, applyActivation(hiddenOutput, ::sigmoidDerivative))
+                val hiddenGradient = hadamardProduct(hiddenError, applyActivation(hiddenOutput, ::sigmoidDerivative))
                 val inputTransposed = transpose(inputMatrix)
                 val deltaWeightsInputHidden = dotProduct(inputTransposed, hiddenGradient)
 
@@ -59,13 +72,13 @@ class Autoenkoder(
         }
     }
 
-    private fun encode(input: DoubleArray): DoubleArray {
+    fun encode(input: DoubleArray): DoubleArray {
         val inputMatrix = arrayOf(input)
         val hiddenInput = add(dotProduct(inputMatrix, encodeWeights), arrayOf(biasHidden))
         return applyActivation(hiddenInput, ::sigmoid)[0]
     }
 
-    private fun decode(encoded: DoubleArray): DoubleArray {
+    fun decode(encoded: DoubleArray): DoubleArray {
         val encodedMatrix = arrayOf(encoded)
         val outputInput = add(dotProduct(encodedMatrix, decodeWeights), arrayOf(biasOutput))
         return applyActivation(outputInput, ::sigmoid)[0]
@@ -75,48 +88,4 @@ class Autoenkoder(
         return decode(encode(input))
     }
 
-    // activation functions
-    private fun sigmoid(x: Double): Double = 1.0 / (1.0 + exp(-x))
-    private fun sigmoidDerivative(x: Double): Double = x * (1.0 - x)
-
-    // matrix helper functions
-    private fun randomMatrix(rows: Int, cols: Int, range: Double = 1.0): Array<DoubleArray> =
-        Array(rows) { DoubleArray(cols) { Random.nextDouble(-range, range) } }
-
-    private fun dotProduct(a: Array<DoubleArray>, b: Array<DoubleArray>): Array<DoubleArray> {
-        val rowsA = a.size
-        val colsA = a[0].size
-        val colsB = b[0].size
-        val result = Array(rowsA) { DoubleArray(colsB) }
-
-        for (i in 0 until rowsA) {
-            for (j in 0 until colsB) {
-                for (k in 0 until colsA) {
-                    result[i][j] += a[i][k] * b[k][j]
-                }
-            }
-        }
-        return result
-    }
-
-    private fun transpose(matrix: Array<DoubleArray>): Array<DoubleArray> {
-        val rows = matrix.size
-        val cols = matrix[0].size
-        return Array(cols) { col -> DoubleArray(rows) { row -> matrix[row][col] } }
-    }
-
-    private fun applyActivation(matrix: Array<DoubleArray>, activation: (Double) -> Double): Array<DoubleArray> =
-        matrix.map { row -> row.map { activation(it) }.toDoubleArray() }.toTypedArray()
-
-    private fun subtract(a: Array<DoubleArray>, b: Array<DoubleArray>): Array<DoubleArray> =
-        a.mapIndexed { i, row -> row.mapIndexed { j, value -> value - b[i][j] }.toDoubleArray() }.toTypedArray()
-
-    private fun hadamard(a: Array<DoubleArray>, b: Array<DoubleArray>): Array<DoubleArray> =
-        a.mapIndexed { i, row -> row.mapIndexed { j, value -> value * b[i][j] }.toDoubleArray() }.toTypedArray()
-
-    private fun scalarMultiply(matrix: Array<DoubleArray>, scalar: Double): Array<DoubleArray> =
-        matrix.map { row -> row.map { it * scalar }.toDoubleArray() }.toTypedArray()
-
-    private fun add(a: Array<DoubleArray>, b: Array<DoubleArray>): Array<DoubleArray> =
-        a.mapIndexed { i, row -> row.mapIndexed { j, value -> value + b[i][j] }.toDoubleArray() }.toTypedArray()
 }
