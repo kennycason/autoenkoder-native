@@ -46,6 +46,32 @@ class AutoenkoderTest {
         }
     }
 
+    @Test
+    fun `autoencoder - pokeball grayscale image`() {
+        val filePath = "./images/pokeball.bmp"
+        val bmpData = Bitmap.readBitmapAsGrayScale(filePath)
+        val trainingData = arrayOf(bmpData.map { it / 255.0 }.toDoubleArray())
+
+        val autoEncoder = Autoenkoder(inputSize = bmpData.size, hiddenSize = 25)
+        val elapsedMs = measureTime {
+            autoEncoder.train(trainingData, learningRate = 0.1, epochs = 10_000)
+        }.inWholeMilliseconds
+        println("trained in ${elapsedMs}ms")
+
+        val xs = trainingData.first()
+        val ys = autoEncoder.predict(xs)
+        Bitmap.writeGrayScaleBitmap( // WIP output image format not working
+            filePath = "./output/pokeball_grayscale_16x16.bmp",
+            data = ys.map { it * 255.0 }.toDoubleArray(),
+            width = 16, height = 16
+        )
+
+        trainingData.forEach { xs ->
+            println("input:  ${xs.joinToString { round(it).toString() }}\n" +
+                    "output: ${ys.joinToString { round(it).toString() }}")
+        }
+    }
+
     private fun round(value: Double) = ceil(value * 10) / 10
 
 }
