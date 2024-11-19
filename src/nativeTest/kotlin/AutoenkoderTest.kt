@@ -47,12 +47,15 @@ class AutoenkoderTest {
     }
 
     @Test
-    fun `autoencoder - pokeball grayscale image`() {
-        val filePath = "./images/pokeball.bmp"
-        val bmpData = Bitmap.readBitmapAsGrayScale(filePath)
-        val trainingData = arrayOf(bmpData.map { it / 255.0 }.toDoubleArray())
+    fun `autoencoder - tiny grayscale square image`() {
+        val filePath = "./images/gray_square.bmp"
+        val bitmap = BitmapIO.read(filePath)
+        val trainingData = arrayOf(BitmapByteNormalizer.normalize(bitmap.data))
+        trainingData.first().forEach {
+            println(it)
+        }
 
-        val autoEncoder = Autoenkoder(inputSize = bmpData.size, hiddenSize = 25)
+        val autoEncoder = Autoenkoder(inputSize = trainingData.first().size, hiddenSize = 1)
         val elapsedMs = measureTime {
             autoEncoder.train(trainingData, learningRate = 0.1, epochs = 10_000)
         }.inWholeMilliseconds
@@ -60,10 +63,71 @@ class AutoenkoderTest {
 
         val xs = trainingData.first()
         val ys = autoEncoder.predict(xs)
-        Bitmap.writeGrayScaleBitmap( // WIP output image format not working
-            filePath = "./output/pokeball_grayscale_16x16.bmp",
-            data = ys.map { it * 255.0 }.toDoubleArray(),
-            width = 16, height = 16
+        BitmapIO.write(
+            filePath = "./output/gray_square_learned.bmp",
+            bitmap = Bitmap(
+                header = bitmap.header,
+                data = ys.map { (it * 255.0).toUInt() }.toUIntArray()
+            )
+        )
+
+        trainingData.forEach { xs ->
+            println("input:  ${xs.joinToString { round(it).toString() }}\n" +
+                    "output: ${ys.joinToString { round(it).toString() }}")
+        }
+    }
+
+    @Test
+    fun `autoencoder - pokeball grayscale`() {
+        val filePath = "./images/pokeball.bmp"
+        val bitmap = BitmapIO.read(filePath)
+        val grayscaleBitmap = BitmapIO.toGrayscale(bitmap)
+        val trainingData = arrayOf(
+            BitmapByteNormalizer.normalize(grayscaleBitmap.data)
+        )
+
+        val autoEncoder = Autoenkoder(inputSize = trainingData.first().size, hiddenSize = 10)
+        val elapsedMs = measureTime {
+            autoEncoder.train(trainingData, learningRate = 0.1, epochs = 20_000)
+        }.inWholeMilliseconds
+        println("trained in ${elapsedMs}ms")
+
+        val xs = trainingData.first()
+        val ys = autoEncoder.predict(xs)
+        BitmapIO.write(
+            filePath = "./output/pokeball_grayscale_learned.bmp",
+            bitmap = Bitmap(
+                header = grayscaleBitmap.header,
+                data = ys.map { (it * 255.0).toUInt() }.toUIntArray()
+            )
+        )
+
+        trainingData.forEach { xs ->
+            println("input:  ${xs.joinToString { round(it).toString() }}\n" +
+                    "output: ${ys.joinToString { round(it).toString() }}")
+        }
+    }
+
+    @Test
+    fun `autoencoder - pokeball color`() {
+        val filePath = "./images/pokeball.bmp"
+        val bitmap = BitmapIO.read(filePath)
+        val trainingData = arrayOf(BitmapPixelDataTransforms.toAutoenkoderInput(bitmap))
+
+        val autoEncoder = Autoenkoder(inputSize = trainingData.first().size, hiddenSize = 10)
+        val elapsedMs = measureTime {
+            autoEncoder.train(trainingData, learningRate = 0.05, epochs = 20_000)
+        }.inWholeMilliseconds
+        println("trained in ${elapsedMs}ms")
+
+        val xs = trainingData.first()
+        val ys = autoEncoder.predict(xs)
+        BitmapIO.write(
+            filePath = "./output/pokeball_color_learned.bmp",
+            bitmap = Bitmap(
+                header = bitmap.header,
+                data = BitmapPixelDataTransforms.toBitMapData(bitmap.header.pixelFormat, ys)
+            )
         )
 
         trainingData.forEach { xs ->

@@ -2,6 +2,14 @@
 
 Autoencoder in Kotlin Native
 
+## Learn Pokéball Images
+
+| <img src="https://raw.githubusercontent.com/kennycason/autoenkoder-native/refs/heads/main/images/pokeball.bmp" width="64px" /> | <img src="https://raw.githubusercontent.com/kennycason/autoenkoder-native/refs/heads/main/images/pokeball_grayscale_learned.bmp" width="64px" /> | <img src="https://raw.githubusercontent.com/kennycason/autoenkoder-native/refs/heads/main/images/pokeball_color_learned.bmp" width="64px" /> |
+| Original Image | Learned Grayscale Image | Learned Color Image |
+
+
+## Learn NXOR / Parity Check
+
 ```kotlin
 val autoEncoder = Autoenkoder(inputSize = 3, hiddenSize = 2)
 val trainingData = arrayOf(
@@ -29,7 +37,9 @@ input: 1.0, 0.0, 0.0, reconstructed: 0.9379659435554321, 0.07327247025541789, 2.
 input: 1.0, 1.0, 1.0, reconstructed: 0.936292022686433, 0.9999946754167286, 0.9346902098542325
 ```
 
-Learning Random 10 Dimensional Vectors
+
+
+## Learn Random 10 Dimensional Vectors
 
 ```
 epoch 0, error: 0.9579067855245543

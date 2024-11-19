@@ -8,8 +8,6 @@ import Matrix.subtract
 import Matrix.transpose
 import kotlin.math.exp
 import kotlin.random.Random
-import kotlin.system.getTimeMillis
-
 
 /*
  * Autoencoder Neural Network trained via backpropagation.
