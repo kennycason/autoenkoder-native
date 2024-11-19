@@ -5,6 +5,7 @@ Autoencoder in Kotlin Native
 ## Learn Pokéball Images
 
 | <img src="https://raw.githubusercontent.com/kennycason/autoenkoder-native/refs/heads/main/images/pokeball.bmp" width="64px" /> | <img src="https://raw.githubusercontent.com/kennycason/autoenkoder-native/refs/heads/main/images/pokeball_grayscale_learned.bmp" width="64px" /> | <img src="https://raw.githubusercontent.com/kennycason/autoenkoder-native/refs/heads/main/images/pokeball_color_learned.bmp" width="64px" /> |
+|----------------|-------------------------|---------------------|
 | Original Image | Learned Grayscale Image | Learned Color Image |
 
 
