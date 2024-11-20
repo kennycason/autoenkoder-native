@@ -18,12 +18,14 @@ class AutoenkoderTest {
             autoEncoder.train(trainingData, learningRate = 0.2, epochs = 10_000)
         }.inWholeMilliseconds
         println("trained in ${elapsedMs}ms")
-        trainingData.forEach { xs ->
-            println("input: ${xs.joinToString()}, reconstructed: ${autoEncoder.predict(xs).joinToString()}")
+        println("error ${autoEncoder.calculateError(trainingData)}")
+
+        trainingData.forEach { x ->
+            println("input: ${x.joinToString()}, reconstructed: ${autoEncoder.predict(x).joinToString()}")
         }
         println("rounded")
-        trainingData.forEach { xs ->
-            println("input: ${xs.joinToString()}, reconstructed: ${autoEncoder.predict(xs).joinToString { round(it).toString() }}")
+        trainingData.forEach { x ->
+            println("input: ${x.joinToString()}, reconstructed: ${autoEncoder.predict(x).joinToString { round(it).toString() }}")
         }
     }
 
@@ -37,12 +39,14 @@ class AutoenkoderTest {
             autoEncoder.train(trainingData, learningRate = 0.2, epochs = 10_000)
         }.inWholeMilliseconds
         println("trained in ${elapsedMs}ms")
-        trainingData.forEach { xs ->
-            println("input: ${xs.joinToString()}, reconstructed: ${autoEncoder.predict(xs).joinToString()}")
+        println("error ${autoEncoder.calculateError(trainingData)}")
+
+        trainingData.forEach { x ->
+            println("input: ${x.joinToString()}, reconstructed: ${autoEncoder.predict(x).joinToString()}")
         }
         println("rounded")
-        trainingData.forEach { xs ->
-            println("input: ${xs.joinToString { round(it).toString() }}, reconstructed: ${autoEncoder.predict(xs).joinToString { round(it).toString() }}")
+        trainingData.forEach { x ->
+            println("input: ${x.joinToString { round(it).toString() }}, reconstructed: ${autoEncoder.predict(x).joinToString { round(it).toString() }}")
         }
     }
 
@@ -60,21 +64,17 @@ class AutoenkoderTest {
             autoEncoder.train(trainingData, learningRate = 0.1, epochs = 10_000)
         }.inWholeMilliseconds
         println("trained in ${elapsedMs}ms")
+        println("error ${autoEncoder.calculateError(trainingData)}")
 
-        val xs = trainingData.first()
-        val ys = autoEncoder.predict(xs)
+        val x = trainingData.first()
+        val y = autoEncoder.predict(x)
         BitmapIO.write(
             filePath = "./output/gray_square_learned.bmp",
             bitmap = Bitmap(
                 header = bitmap.header,
-                data = ys.map { (it * 255.0).toUInt() }.toUIntArray()
+                data = y.map { (it * 255.0).toUInt() }.toUIntArray()
             )
         )
-
-        trainingData.forEach { xs ->
-            println("input:  ${xs.joinToString { round(it).toString() }}\n" +
-                    "output: ${ys.joinToString { round(it).toString() }}")
-        }
     }
 
     @Test
@@ -91,21 +91,17 @@ class AutoenkoderTest {
             autoEncoder.train(trainingData, learningRate = 0.1, epochs = 20_000)
         }.inWholeMilliseconds
         println("trained in ${elapsedMs}ms")
+        println("error ${autoEncoder.calculateError(trainingData)}")
 
-        val xs = trainingData.first()
-        val ys = autoEncoder.predict(xs)
+        val x = trainingData.first()
+        val y = autoEncoder.predict(x)
         BitmapIO.write(
             filePath = "./output/pokeball_grayscale_learned.bmp",
             bitmap = Bitmap(
                 header = grayscaleBitmap.header,
-                data = ys.map { (it * 255.0).toUInt() }.toUIntArray()
+                data = y.map { (it * 255.0).toUInt() }.toUIntArray()
             )
         )
-
-        trainingData.forEach { xs ->
-            println("input:  ${xs.joinToString { round(it).toString() }}\n" +
-                    "output: ${ys.joinToString { round(it).toString() }}")
-        }
     }
 
     @Test
@@ -119,21 +115,17 @@ class AutoenkoderTest {
             autoEncoder.train(trainingData, learningRate = 0.05, epochs = 20_000)
         }.inWholeMilliseconds
         println("trained in ${elapsedMs}ms")
+        println("error ${autoEncoder.calculateError(trainingData)}")
 
-        val xs = trainingData.first()
-        val ys = autoEncoder.predict(xs)
+        val x = trainingData.first()
+        val y = autoEncoder.predict(x)
         BitmapIO.write(
             filePath = "./output/pokeball_color_learned.bmp",
             bitmap = Bitmap(
                 header = bitmap.header,
-                data = BitmapPixelDataTransforms.toBitMapData(bitmap.header.pixelFormat, ys)
+                data = BitmapPixelDataTransforms.toBitMapData(bitmap.header.pixelFormat, y)
             )
         )
-
-        trainingData.forEach { xs ->
-            println("input:  ${xs.joinToString { round(it).toString() }}\n" +
-                    "output: ${ys.joinToString { round(it).toString() }}")
-        }
     }
 
     private fun round(value: Double) = ceil(value * 10) / 10

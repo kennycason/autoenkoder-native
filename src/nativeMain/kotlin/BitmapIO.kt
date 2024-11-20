@@ -22,7 +22,7 @@ enum class PixelFormat {
 }
 
 object BitmapIO {
-    @OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class)
+    @OptIn(ExperimentalForeignApi::class)
     fun read(filePath: String): Bitmap {
         memScoped {
             val filePtr = fopen(filePath, "rb") ?: throw IllegalArgumentException("Unable to open file: $filePath")
@@ -100,7 +100,7 @@ object BitmapIO {
         }
     }
 
-    @OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class)
+    @OptIn(ExperimentalForeignApi::class)
     fun write(filePath: String, bitmap: Bitmap) {
         memScoped {
             val filePtr = fopen(filePath, "wb") ?: throw IllegalArgumentException("Unable to open file: $filePath")

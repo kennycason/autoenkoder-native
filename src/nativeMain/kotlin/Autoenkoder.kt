@@ -70,6 +70,27 @@ class Autoenkoder(
         }
     }
 
+    fun calculateError(inputs: Array<DoubleArray>): Double {
+        var totalError = 0.0
+        for (input in inputs) {
+            val inputMatrix = arrayOf(input)
+
+            // forward propagation
+            val hiddenInput = add(dotProduct(inputMatrix, encodeWeights), arrayOf(biasHidden))
+            val hiddenOutput = applyActivation(hiddenInput, ::sigmoid)
+
+            val outputInput = add(dotProduct(hiddenOutput, decodeWeights), arrayOf(biasOutput))
+            val output = applyActivation(outputInput, ::sigmoid)
+
+            // calculate error
+            val errors: Array<DoubleArray> = subtract(inputMatrix, output)
+            totalError += errors.flatMap { it.asIterable() }.sumOf { it * it }
+        }
+
+        val meanError = totalError / inputs.size
+        return meanError
+    }
+
     fun encode(input: DoubleArray): DoubleArray {
         val inputMatrix = arrayOf(input)
         val hiddenInput = add(dotProduct(inputMatrix, encodeWeights), arrayOf(biasHidden))
