@@ -36,7 +36,6 @@ class StackedAutoenkoderTest {
                 data = BitmapPixelDataTransforms.toBitMapData(bitmap.header.pixelFormat, y)
             )
         )
-
     }
 
     @Test

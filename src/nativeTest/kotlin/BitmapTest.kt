@@ -26,7 +26,6 @@ class BitmapTest {
         }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun `read write read bmp - grayscale`() {
         val colorFilePath = "./images/pokeball.bmp"
@@ -47,8 +46,6 @@ class BitmapTest {
         }
     }
 
-
-    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun `read write read bmp - grayscale square`() {
         val graySquareInputFilePath = "./images/gray_square.bmp"

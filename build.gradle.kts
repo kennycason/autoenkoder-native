@@ -31,6 +31,20 @@ kotlin {
         }
     }
 
+    targets {
+        all {
+            compilations.all {
+                kotlinOptions {
+                    freeCompilerArgs += listOf(
+                        "-opt-in=kotlinx.cinterop.ExperimentalForeignApi",
+                        "-opt-in=kotlin.ExperimentalStdlibApi"
+                    )
+                }
+            }
+        }
+    }
+
+
     sourceSets {
         nativeMain.dependencies {
             implementation(libs.kotlinxSerializationJson)
